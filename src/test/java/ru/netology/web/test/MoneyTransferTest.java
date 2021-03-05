@@ -22,18 +22,39 @@ class MoneyTransferTest {
         return new MyCardsPage();
     }
 
+    private int ballansToInit(MyCardsPage myCardsPage, int card1, int card2) {
+        // возвращает (выравнивает) суммы на картах
+        int sum1 = myCardsPage.getSum(card1);
+        int sum2 = myCardsPage.getSum(card2);
+        int diffSum = sum1 - sum2;
+        int numSourceCard = card1;
+        int numTargetCard = card2;
+        if (diffSum == 0) {
+            return sum1;
+        } else if (diffSum < 0) {
+            numSourceCard = card2;
+            numTargetCard = card1;
+        }
+        myCardsPage.transfer(numSourceCard, numTargetCard, -diffSum / 2, codeCard(numSourceCard));
+        return (sum1 + sum2) / 2;
+    }
+
+    private String codeCard(int index) {
+        return DataHelper.getCardByIndex(index);
+    }
+
     @Test
     void shouldHappyPathCard1() {
         MyCardsPage myCardsPage = initCardsPage();
         int numSourceCard = 1;
         int numTargetCard = 0;
-        int summTransf = 5000;
-        int initSum = myCardsPage.ballansToInit(numSourceCard, numTargetCard);
+        int sumTransf = 5000;
+        int initSum = ballansToInit(myCardsPage, 0, 1);
         assertEquals(INIT_SUM, initSum);
-        myCardsPage.transfer(numSourceCard, numTargetCard, summTransf);
-        int expectedTarget = INIT_SUM + summTransf;
+        myCardsPage.transfer(numSourceCard, numTargetCard, sumTransf, codeCard(numSourceCard));
+        int expectedTarget = INIT_SUM + sumTransf;
         assertEquals(expectedTarget, myCardsPage.getSum(numTargetCard));
-        int expectedSource = INIT_SUM - summTransf;
+        int expectedSource = INIT_SUM - sumTransf;
         assertEquals(expectedSource, myCardsPage.getSum(numSourceCard));
     }
 
@@ -42,13 +63,13 @@ class MoneyTransferTest {
         MyCardsPage myCardsPage = initCardsPage();
         int numSourceCard = 0;
         int numTargetCard = 1;
-        int summTransf = 5000;
-        int initSum = myCardsPage.ballansToInit(numSourceCard, numTargetCard);
+        int sumTransf = 5000;
+        int initSum = ballansToInit(myCardsPage, 0, 1);
         assertEquals(INIT_SUM, initSum);
-        myCardsPage.transfer(numSourceCard, numTargetCard, summTransf);
-        int expectedTarget = INIT_SUM + summTransf;
+        myCardsPage.transfer(numSourceCard, numTargetCard, sumTransf, codeCard(numSourceCard));
+        int expectedTarget = INIT_SUM + sumTransf;
         assertEquals(expectedTarget, myCardsPage.getSum(numTargetCard));
-        int expectedSource = INIT_SUM - summTransf;
+        int expectedSource = INIT_SUM - sumTransf;
         assertEquals(expectedSource, myCardsPage.getSum(numSourceCard));
     }
 
@@ -57,13 +78,13 @@ class MoneyTransferTest {
         MyCardsPage myCardsPage = initCardsPage();
         int numSourceCard = 1;
         int numTargetCard = 0;
-        int summTransf = 10000;
-        int initSum = myCardsPage.ballansToInit(numSourceCard, numTargetCard);
+        int sumTransf = 10000;
+        int initSum = ballansToInit(myCardsPage, 0, 1);
         assertEquals(INIT_SUM, initSum);
-        myCardsPage.transfer(numSourceCard, numTargetCard, summTransf);
-        int expectedTarget = INIT_SUM + summTransf;
+        myCardsPage.transfer(numSourceCard, numTargetCard, sumTransf, codeCard(numSourceCard));
+        int expectedTarget = INIT_SUM + sumTransf;
         assertEquals(expectedTarget, myCardsPage.getSum(numTargetCard));
-        int expectedSource = INIT_SUM - summTransf;
+        int expectedSource = INIT_SUM - sumTransf;
         assertEquals(expectedSource, myCardsPage.getSum(numSourceCard));
     }
 
@@ -72,13 +93,13 @@ class MoneyTransferTest {
         MyCardsPage myCardsPage = initCardsPage();
         int numSourceCard = 0;
         int numTargetCard = 1;
-        int summTransf = 10000;
-        int initSum = myCardsPage.ballansToInit(numSourceCard, numTargetCard);
+        int sumTransf = 10000;
+        int initSum = ballansToInit(myCardsPage, 0, 1);
         assertEquals(INIT_SUM, initSum);
-        myCardsPage.transfer(numSourceCard, numTargetCard, summTransf);
-        int expectedTarget = INIT_SUM + summTransf;
+        myCardsPage.transfer(numSourceCard, numTargetCard, sumTransf, codeCard(numSourceCard));
+        int expectedTarget = INIT_SUM + sumTransf;
         assertEquals(expectedTarget, myCardsPage.getSum(numTargetCard));
-        int expectedSource = INIT_SUM - summTransf;
+        int expectedSource = INIT_SUM - sumTransf;
         assertEquals(expectedSource, myCardsPage.getSum(numSourceCard));
     }
 
@@ -87,10 +108,10 @@ class MoneyTransferTest {
         MyCardsPage myCardsPage = initCardsPage();
         int numSourceCard = 0;
         int numTargetCard = 0;
-        int summTransf = 1000;
-        int initSum = myCardsPage.ballansToInit(0, 1);
+        int sumTransf = 1000;
+        int initSum = ballansToInit(myCardsPage, 0, 1);
         assertEquals(INIT_SUM, initSum);
-        myCardsPage.transfer(numSourceCard, numTargetCard, summTransf);
+        myCardsPage.transfer(numSourceCard, numTargetCard, sumTransf, codeCard(numSourceCard));
         int expectedTarget = INIT_SUM;
         assertEquals(expectedTarget, myCardsPage.getSum(numTargetCard));
         int expectedSource = INIT_SUM;
@@ -100,12 +121,12 @@ class MoneyTransferTest {
     @Test
     void shouldTransferByWrongCard() {
         MyCardsPage myCardsPage = initCardsPage();
-        int numSourceCard = 2;
+        int numSourceCard = 1;
         int numTargetCard = 0;
-        int summTransf = 1000;
-        int initSum = myCardsPage.ballansToInit(0, 1);
+        int sumTransf = 1000;
+        int initSum = ballansToInit(myCardsPage, 0, 1);
         assertEquals(INIT_SUM, initSum);
-        myCardsPage.transfer(numSourceCard, numTargetCard, summTransf);
+        myCardsPage.transfer(numSourceCard, numTargetCard, sumTransf, codeCard(2));
         String errText = myCardsPage.isErrMessage();
         assertEquals("Ошибка! Произошла ошибка", errText);
     }
@@ -115,16 +136,14 @@ class MoneyTransferTest {
         MyCardsPage myCardsPage = initCardsPage();
         int numSourceCard = 1;
         int numTargetCard = 0;
-        int summTransf = 12000;
-        int initSum = myCardsPage.ballansToInit(numSourceCard, numTargetCard);
+        int sumTransf = 12000;
+        int initSum = ballansToInit(myCardsPage, 0, 1);
         assertEquals(INIT_SUM, initSum);
-        myCardsPage.transfer(numSourceCard, numTargetCard, summTransf);
-        int expectedTarget = INIT_SUM; // + summTransf;
-
+        myCardsPage.transfer(numSourceCard, numTargetCard, sumTransf, codeCard(numSourceCard));
+        int expectedTarget = INIT_SUM; // + sumTransf;
         assertEquals(expectedTarget, myCardsPage.getSum(numTargetCard));
-        int expectedSource = INIT_SUM; // - summTransf;
+        int expectedSource = INIT_SUM; // - sumTransf;
         assertEquals(expectedSource, myCardsPage.getSum(numSourceCard));
-        System.out.println("s:" + expectedSource + " t:" + expectedTarget);
     }
 
     @Test
@@ -132,15 +151,14 @@ class MoneyTransferTest {
         MyCardsPage myCardsPage = initCardsPage();
         int numSourceCard = 0;
         int numTargetCard = 1;
-        int summTransf = 12000;
-        int initSum = myCardsPage.ballansToInit(numSourceCard, numTargetCard);
+        int sumTransf = 12000;
+        int initSum = ballansToInit(myCardsPage, 0, 1);
         assertEquals(INIT_SUM, initSum);
-        myCardsPage.transfer(numSourceCard, numTargetCard, summTransf);
-        int expectedTarget = INIT_SUM; // + summTransf;
+        myCardsPage.transfer(numSourceCard, numTargetCard, sumTransf, codeCard(numSourceCard));
+        int expectedTarget = INIT_SUM; //+ sumTransf;
         assertEquals(expectedTarget, myCardsPage.getSum(numTargetCard));
-        int expectedSource = INIT_SUM; // - summTransf;
+        int expectedSource = INIT_SUM; // - sumTransf;
         assertEquals(expectedSource, myCardsPage.getSum(numSourceCard));
     }
-
 }
 
